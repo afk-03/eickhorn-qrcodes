@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Specification - Eickhorn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, rgb(8, 56, 107) 0%, rgba(8, 56, 107, 0.9) 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background-color: #003366; /* Match logo background */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+        .logo {
+    height: 50px;         /* lock logo height */
+    width: auto;          /* scale proportionally */
+    object-fit: contain;  /* ensure full logo visible */
+    display: block;       /* removes inline spacing quirks */
+}
+
+
+
+        .qr-button {
+            background: white;
+            color: rgb(8, 56, 107);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qr-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image {
+    width: 100%;
+    max-height: 400px;       /* keeps a reasonable height */
+    object-fit: contain;     /* no cropping */
+    display: block;
+    margin: 0 auto;
+    background: #fff;        /* optional: ensures transparent PNGs are visible */
+}
+
+
+        .content {
+            padding: 30px;
+        }
+
+        .product-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .product-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .specs-table th,
+        .specs-table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .specs-table th {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+            color: white;
+        }
+
+        .specs-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .specs-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .back-button, .print-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .back-button:hover, .print-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        .print-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* QR Code Modal */
+        .qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .qr-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+        }
+
+        .qr-modal-content h3 {
+            color: rgb(8, 56, 107);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .qr-code-display {
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9f9f9;
+            color: rgb(8, 56, 107);
+            font-size: 14px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: rgb(8, 56, 107);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .url-display {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            word-break: break-all;
+            font-family: monospace;
+            color: rgb(8, 56, 107);
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .product-title {
+                font-size: 2rem;
+            }
+            
+            .specs-table th,
+            .specs-table td {
+                padding: 12px 15px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .container {
+                background: white;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+            .qr-button, .actions {
+                display: none;
+            }
+        }
+    </style>
+    <!-- Include QR Code generation library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="../logo.png" alt="Eickhorn Logo" class="logo">
+            <button class="qr-button" onclick="showQRCode()">
+                <span>📱</span> Show QR Code
+            </button>
+        </div>        <img src="https://www.eickhorn-solingen.de/WebRoot/Store22/Shops/62631327/6661/4D8F/8270/385E/9F26/0A0C/6D0F/AC99/820115_RT-III_SF_Kopie_ml.jpg" alt="Product Image" class="product-image">        <div class="content">
+            <div class="actions">
+                <a href="../index.html" class="back-button">← Back to Directory</a>
+                <button class="print-button" onclick="window.print()">🖨️ Print PDF</button>
+            </div>            <h1 class="product-title">RT-III SF</h1>
+            <p class="product-subtitle">Article Number: 820115</p>
+
+            <table class="specs-table">
+                <thead>
+                    <tr>
+                        <th>Specification</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>                    <tr><th>Blade Length / Klingenlänge</th><td>135</td></tr>
+                    <tr><th>Blade Thickness / Klingenstärke</th><td>4.7</td></tr>
+                    <tr><th>Total Length / Gesamtlänge</th><td>270</td></tr>
+                    <tr><th>Knife Weight / Messergewicht</th><td>250</td></tr>
+                    <tr><th>Total Weight / Gesamtgewicht</th><td>456</td></tr>
+                    <tr><th>Blade Material / Klingenmaterial</th><td>Eickhorn Professional</td></tr>
+                    <tr><th>Handle Material / Griffmaterial</th><td>Glass Reinforced Polyamide</td></tr>
+                    <tr><th>Handle Color / Grifffarbe</th><td>Black</td></tr>
+                    <tr><th>Blade Finish / Klingenoberfläche</th><td>Kalgard</td></tr>
+                    <tr><th>Sheath / Scheide</th><td>Multi-Part</td></tr>
+                    <tr><th>Sheath Part 1 Material / Scheidenteil 1 Material</th><td>Cordura</td></tr>
+                    <tr><th>Sheath Part 1 Colour / Scheidenteil 1 Farbe</th><td>Black</td></tr>
+                    <tr><th>Sheath Part 2 Material / Scheidenteil 2 Material</th><td>Polyamide Insert</td></tr>
+                    <tr><th>Sheath Part 2 Colour / Scheidenteil 2 Farbe</th><td>Black</td></tr>
+                    <tr><th>MOLLE-Compatible / MOLLE-Kompatibel</th><td>Yes</td></tr>
+                    <tr><th>Glass Puncher / Glassbrecher</th><td>Yes</td></tr>
+                    <tr><th>Belt Cutter / Gurtschneider</th><td>Yes</td></tr>
+                    <tr><th>Back Saw / Rückensäge</th><td>Yes</td></tr>
+                    <tr><th>Safety Glass Saw / Sicherheitsglassäge</th><td>Yes</td></tr>
+                    <tr><th>Luminescent / Nachleuchtend</th><td>Not luminescent, for luminescent handle see RT-III 820102, for luminescent blade see RT-III SGT 820123</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-modal-content">
+            <button class="close-modal" onclick="closeQRCode()">×</button>
+            <h3>QR Code for this Product</h3>
+            <div class="qr-code-display" id="qrCodeContainer">
+                <!-- QR code will be generated here -->
+            </div>
+            <div class="url-display" id="urlDisplay">
+                <!-- Current URL will be shown here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showQRCode() {
+            const modal = document.getElementById('qrModal');
+            const qrContainer = document.getElementById('qrCodeContainer');
+            const urlDisplay = document.getElementById('urlDisplay');
+            
+            // Get current filename from URL
+            const currentFileName = window.location.pathname.split('/').pop() || 'index.html';
+            const fullURL = `https://qrcode.eickhorn.eu/generated_datasheets/${currentFileName}`;
+            
+            // Clear previous content
+            qrContainer.innerHTML = '';
+            
+            // Generate QR code
+            const canvas = document.createElement('canvas');
+            const qr = new QRious({
+                element: canvas,
+                value: fullURL,
+                size: 250,
+                background: 'white',
+                foreground: 'rgb(8, 56, 107)',
+                level: 'H'
+            });
+            
+            qrContainer.appendChild(canvas);
+            urlDisplay.textContent = fullURL;
+            modal.style.display = 'flex';
+        }
+
+        function closeQRCode() {
+            document.getElementById('qrModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('qrModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeQRCode();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeQRCode();
+            }
+        });
+
+        // Add loading animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            container.style.transition = 'all 0.6s ease';
+            
+            setTimeout(() => {
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
